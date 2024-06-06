@@ -24,3 +24,11 @@ Lisp interop:
 > (uiop:hostname) stack
 (garlic)
 ```
+
+Native procedures can be implemented with `define-forth`, giving access to `self`
+
+```lisp
+(define-forth +
+  (incf (cadr (stack self))
+        (pop (stack self))))
+```
