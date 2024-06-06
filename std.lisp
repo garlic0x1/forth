@@ -51,3 +51,26 @@
 (define-forth print
   (format (output self) "~a " (pop (stack self)))
   :ok)
+
+(define-forth emit
+  (format (output self) "~a" (code-char (pop (stack self)))))
+
+(define-forth cr
+  (format (output self) "~a~a" #\Return #\Newline))
+
+(define-forth =
+  (push (= (pop (stack self)) (pop (stack self)))
+        (stack self)))
+
+(define-forth equal
+  (push (equal (pop (stack self)) (pop (stack self)))
+        (stack self)))
+
+(define-forth <
+  (push (< (pop (stack self)) (pop (stack self))) (stack self)))
+
+(define-forth >
+  (push (> (pop (stack self)) (pop (stack self))) (stack self)))
+
+(define-forth invert
+  (push (not (pop (stack self)))))

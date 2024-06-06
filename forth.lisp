@@ -31,6 +31,10 @@
     :initarg :output
     :initform *standard-output*
     :accessor output)
+   (output-err
+    :initarg :output-err
+    :initform *debug-io*
+    :accessor output-err)
    (quoted
     :initform nil
     :accessor quoted)
@@ -51,6 +55,10 @@
         (funcall value self)
         :?)))
 
+(defmethod forth-eval (self (obj string))
+  (push obj (stack self))
+  :ok)
+
 (defmethod forth-eval (self (obj list))
   (let ((res))
     (dolist (it obj) (setf res (forth-eval self it)))
@@ -61,10 +69,10 @@
 
 (defmethod run-forth ()
   (let ((forth (make-instance 'forth)))
-    (format (output forth) "> ")
+    (format (output-err forth) "> ")
     (loop :until (done forth)
           :for line := (read-line (input forth))
           :for words := (read-from-string (format nil "(~a)" line))
           :for out := (forth-eval forth words)
-          :do (format (output forth) "~a~%" out)
-          :do (format (output forth) "> "))))
+          :do (format (output-err forth) "~a~%" out)
+          :do (format (output-err forth) "> "))))
