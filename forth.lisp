@@ -10,7 +10,7 @@
 
 (defun pop-to (word forth &optional acc)
   (let ((head (pop (stack forth))))
-    (if (eql word head)
+    (if (or (null head) (eql word head))
         acc
         (pop-to word forth (cons head acc)))))
 

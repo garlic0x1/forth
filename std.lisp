@@ -15,6 +15,23 @@
               res)))
     (car seq)))
 
+(define-forth if
+  (setf (quoted self) 'then)
+  (push 'if (stack self)))
+
+(define-forth then
+  (setf (quoted self) nil)
+  (let* ((words (pop-to 'if self))
+         (split-point (search (list 'else) words))
+         (res))
+    (if (pop (stack self))
+        (dolist (word (subseq words 0 (or split-point (length words))))
+          (setf res (forth-eval self word)))
+        (when split-point
+          (dolist (word (subseq words split-point (length words)))
+            (setf res (forth-eval self word)))))
+    res))
+
 (define-forth +
   (incf (cadr (stack self))
         (pop (stack self))))
@@ -73,4 +90,22 @@
   (push (> (pop (stack self)) (pop (stack self))) (stack self)))
 
 (define-forth invert
-  (push (not (pop (stack self)))))
+  (setf (car (stack self)) (not (car (stack self)))))
+
+(define-forth mod
+  (let ((divisor (pop (stack self))))
+    (setf (car (stack self)) (mod (car (stack self)) divisor))))
+
+(define-forth do
+  (setf (quoted self) 'loop)
+  (push 'do (stack self)))
+
+(define-forth loop
+  (setf (quoted self) nil)
+  (let ((body (pop-to 'do self))
+        (start (pop (stack self)))
+        (end (pop (stack self))))
+    (loop :for i :from start :to (1- end)
+          :do (setf (gethash 'i (env self)) (lambda (self) (forth-eval self i)))
+              (dolist (word body) (forth-eval self word)))
+    :ok))
