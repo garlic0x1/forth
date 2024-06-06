@@ -1,5 +1,12 @@
 (in-package :forth)
 
+(defun pop-to (word forth &optional acc)
+  "Utility for popping quoted forms."
+  (let ((head (pop (stack forth))))
+    (if (or (null head) (eql word head))
+        acc
+        (pop-to word forth (cons head acc)))))
+
 (define-forth def
   (setf (quoted self) 'end)
   (push 'def (stack self)))

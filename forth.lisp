@@ -9,12 +9,6 @@
            (declare (ignorable self))
            ,@body)))
 
-(defun pop-to (word forth &optional acc)
-  (let ((head (pop (stack forth))))
-    (if (or (null head) (eql word head))
-        acc
-        (pop-to word forth (cons head acc)))))
-
 (defclass forth ()
   ((stack
     :initarg :stack
@@ -62,9 +56,6 @@
 
 (defmethod forth-eval (self (obj list))
   (push (eval obj) (stack self)))
-
-(defmethod forth-eval (self obj)
-  (error (format nil "Unknown type: ~a, type: ~a~%" obj (type-of obj))))
 
 (defun forth-eval-words (self words)
   (let ((res))
