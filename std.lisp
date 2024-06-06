@@ -32,9 +32,19 @@
             (setf res (forth-eval self word)))))
     res))
 
-(define-forth +
-  (incf (cadr (stack self))
-        (pop (stack self))))
+(define-forth do
+  (setf (quoted self) 'loop)
+  (push 'do (stack self)))
+
+(define-forth loop
+  (setf (quoted self) nil)
+  (let ((body (pop-to 'do self))
+        (start (pop (stack self)))
+        (end (pop (stack self))))
+    (loop :for i :from start :to (1- end)
+          :do (setf (gethash 'i (env self)) (lambda (self) (forth-eval self i)))
+              (dolist (word body) (forth-eval self word)))
+    :ok))
 
 (define-forth stack (stack self))
 
@@ -42,11 +52,11 @@
 
 (define-forth exit (setf (done self) t))
 
-;; stack manipulation
-
 (define-forth dup (push (car (stack self)) (stack self)))
 
 (define-forth drop (pop (stack self)))
+
+(define-forth clear (setf (stack self) '()))
 
 (define-forth swap
   (let ((head (car (stack self))))
@@ -92,20 +102,22 @@
 (define-forth invert
   (setf (car (stack self)) (not (car (stack self)))))
 
+(define-forth +
+  (incf (cadr (stack self))
+        (pop (stack self))))
+
+(define-forth -
+  (decf (cadr (stack self))
+        (pop (stack self))))
+
+(define-forth *
+  (setf (cadr (stack self))
+        (* (cadr (stack self)) (pop (stack self)))))
+
+(define-forth /
+  (setf (cadr (stack self))
+        (/ (cadr (stack self)) (pop (stack self)))))
+
 (define-forth mod
   (let ((divisor (pop (stack self))))
     (setf (car (stack self)) (mod (car (stack self)) divisor))))
-
-(define-forth do
-  (setf (quoted self) 'loop)
-  (push 'do (stack self)))
-
-(define-forth loop
-  (setf (quoted self) nil)
-  (let ((body (pop-to 'do self))
-        (start (pop (stack self)))
-        (end (pop (stack self))))
-    (loop :for i :from start :to (1- end)
-          :do (setf (gethash 'i (env self)) (lambda (self) (forth-eval self i)))
-              (dolist (word body) (forth-eval self word)))
-    :ok))

@@ -3,6 +3,7 @@
 (defvar *base-env* (make-hash-table))
 
 (defmacro define-forth (symbol &body body)
+  "Define a forth word as a Lisp procedure."
   `(setf (gethash (quote ,symbol) *base-env*)
          (lambda (self)
            (declare (ignorable self))
@@ -60,12 +61,15 @@
   :ok)
 
 (defmethod forth-eval (self (obj list))
-  (let ((res))
-    (dolist (it obj) (setf res (forth-eval self it)))
-    res))
+  (push (eval obj) (stack self)))
 
 (defmethod forth-eval (self obj)
   (error (format nil "Unknown type: ~a, type: ~a~%" obj (type-of obj))))
+
+(defun forth-eval-words (self words)
+  (let ((res))
+    (dolist (word words) (setf res (forth-eval self word)))
+    res))
 
 (defmethod run-forth ()
   (let ((forth (make-instance 'forth)))
@@ -73,6 +77,6 @@
     (loop :until (done forth)
           :for line := (read-line (input forth))
           :for words := (read-from-string (format nil "(~a)" line))
-          :for out := (forth-eval forth words)
+          :for out := (forth-eval-words forth words)
           :do (format (output-err forth) "~a~%" out)
           :do (format (output-err forth) "> "))))
