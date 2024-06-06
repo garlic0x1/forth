@@ -1,8 +1,6 @@
-(defpackage :forth
-  (:use :cl :alexandria :named-readtables))
 (in-package :forth)
 
-(defparameter *base-env* (make-hash-table))
+(defvar *base-env* (make-hash-table))
 
 (defmacro define-forth (symbol &body body)
   `(setf (gethash (quote ,symbol) *base-env*)
@@ -15,31 +13,6 @@
     (if (eql word head)
         acc
         (pop-to word forth (cons head acc)))))
-
-(define-forth def
-  (setf (quoted self) 'end)
-  (push 'def (stack self)))
-
-(define-forth end
-  (setf (quoted self) nil)
-  (let ((seq (pop-to 'def self)))
-    (setf (gethash (car seq) (env self))
-          (lambda (self)
-            (let ((res))
-              (dolist (word (cdr seq))
-                (setf res (forth-eval self word)))
-              res)))
-    (car seq)))
-
-(define-forth +
-  (incf (cadr (stack self))
-        (pop (stack self))))
-
-(define-forth stack (stack self))
-
-(define-forth env (env self))
-
-(define-forth exit (setf (done self) t))
 
 (defclass forth ()
   ((stack

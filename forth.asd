@@ -3,4 +3,6 @@
   :license "MIT"
   :description "An experimental Forth interpreter."
   :depends-on (:alexandria :str :named-readtables)
-  :components ((:file "forth")))
+  :components ((:file "package")
+               (:file "forth")
+               (:file "std")))
