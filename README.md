@@ -16,6 +16,15 @@ FIZZBUZZ
 (fizz buzz buzz buzz buzz fizz buzz buzz buzz buzz fizz buzz)
 ```
 
+Lambdas can be placed on the stack with #(word1 word2):
+
+```forth
+> 1 #(1 +) stack
+(#<FUNCTION (LAMBDA (SELF) :IN FORTH-EVAL) {10027FBF0B}> 1)
+> call stack
+(2)
+```
+
 Lisp interop:
 
 ```forth
