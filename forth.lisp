@@ -57,6 +57,12 @@
 (defmethod forth-eval (self (obj list))
   (push (eval obj) (stack self)))
 
+(defmethod forth-eval (self (obj vector))
+  (push (lambda (self)
+          (loop :for word :across obj
+                :do (forth-eval self word)))
+        (stack self)))
+
 (defun forth-eval-words (self words)
   (let ((res))
     (dolist (word words) (setf res (forth-eval self word)))

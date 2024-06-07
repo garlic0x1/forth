@@ -53,6 +53,9 @@
               (dolist (word body) (forth-eval self word)))
     :ok))
 
+(define-forth call
+  (funcall (pop (stack self)) self))
+
 (define-forth stack (stack self))
 
 (define-forth env (env self))
